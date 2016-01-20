@@ -66,10 +66,9 @@ Loading the
 - **climate data** for the maximum precipitation (mm) and minimum temperature (°C) recorded during the preceding 12 hours of each survey session.
 
 ```{r}
-setwd("/Users/Luke/Documents/Academic_Projects/Killdeer/Killdeer_R_Project/Data_files")
-Behavior <- read.csv("behavior_data_raw.csv")
-Lunar <- read.csv("lunar_data_raw.csv")
-Climate <- read.csv("climate_data_raw.csv")
+Behavior <- read.csv(".//Data_files//behavior_data_raw.csv")
+Lunar <- read.csv(".//Data_files//lunar_data_raw.csv")
+Climate <- read.csv(".//Data_files//climate_data_raw.csv")
 ```
 
 Summarize the `Behavior` data such that each row reveals the total number of individuals engaged in a given behavior on each scan.
