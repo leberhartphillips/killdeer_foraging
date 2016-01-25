@@ -13,13 +13,13 @@ output:
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>", cache = TRUE) # warning = FALSE
 ```
 
-In this document I provide all the necessary code for repeating the analyses presented in my paper.  To access the dataset and Rmarkdown file, please download this [GitHub](https://github.com/leberhartphillips/killdeer_foraging) repository.  Simply follow the link and click on *Download ZIP* on the right-hand side of the page.  An explanation of the files in the repository can be found in the Readme file.  Please don't hesitate to contact me at `luke.eberhart[at]gmail.com` if you have any questions.
+In this document I provide all the necessary code for reproducing the analyses presented in my paper.  To access the dataset and Rmarkdown file, please download this [GitHub](https://github.com/leberhartphillips/killdeer_foraging) repository.  Simply follow the link and click on *Download ZIP* on the right-hand side of the page.  An explanation of the files in the repository can be found in the Readme file.  Please don't hesitate to contact me at `luke.eberhart[at]gmail.com` if you have any questions.
 
 The structure of the code I present here follows the analyses presented in the *Results* section of the paper.
 
 **Prerequisites:**
 
-* For running the complete code you need a `files` subfolder with the raw data file found in the [GitHub](https://github.com/leberhartphillips/killdeer_foraging) repository.
+* For running the complete code you need a `files` subfolder containing the raw data downloaded from `Data_files` folder provided in the  [GitHub](https://github.com/leberhartphillips/killdeer_foraging) repository.
 * The following packages are needed for analysis and can be easily installed from [CRAN](http://cran.r-project.org/) by uncommenting the `install.packages` functions:
 
 ```{r, results="hide", message=FALSE, cache = TRUE}
@@ -59,16 +59,17 @@ library(reshape)
 ***
 ## Loading and wrangling data
 
-Loading the 
+To start, please load the following datasets into your R environment:
 
 - **behavior data** in which each row is a single observation of the behavior (i.e. foraging, roosting, alert, or preening) of an individual on a given date, time, and scan. Within each behavior, a "1" signifies the behavior the individual was engaged in, whereas a "0" signifies the behavior the individual was not engaged in. 
 - **lunar data** of the proportion of the moon's disk that was illuminated the preceding night of the date specified in each row.
 - **climate data** for the maximum precipitation (mm) and minimum temperature (°C) recorded during the preceding 12 hours of each survey session.
 
 ```{r}
-Behavior <- read.csv(".//Data_files//behavior_data_raw.csv")
-Lunar <- read.csv(".//Data_files//lunar_data_raw.csv")
-Climate <- read.csv(".//Data_files//climate_data_raw.csv")
+setwd("/Users/Luke/Documents/Academic_Projects/Killdeer/Killdeer_R_Project/Data_files")
+Behavior <- read.csv("behavior_data_raw.csv")
+Lunar <- read.csv("lunar_data_raw.csv")
+Climate <- read.csv("climate_data_raw.csv")
 ```
 
 Summarize the `Behavior` data such that each row reveals the total number of individuals engaged in a given behavior on each scan.
@@ -280,7 +281,8 @@ Name models and create a ranked AIC table
 
 ```{r}
 Modnames <- paste("Model", 1:length(Forage_models), sep = " ")
-Forage_models_table <- aictab(cand.set = Forage_models, modnames = Modnames, sort = TRUE)
+Forage_models_table <- AICcmodavg::aictab(cand.set = Forage_models, 
+                                          modnames = Modnames, sort = TRUE)
 ```
 
 Calculate evidence ratios and add them to the AIC table
@@ -312,7 +314,7 @@ r2_m <- data.frame(round(t(as.data.frame(t(sapply(Forage_models, r2_m_glmm)))), 
 r2_m$Modnames <- 
   c("Model 1", "Model 2", "Model 3", "Model 4", "Model 5", "Model 6", "Model 7")
 colnames(r2_m) <- c("r2_m", "Modnames")
-Forage_models_table <- left_join(Forage_models_table, r2_m)[,c(1,2,4,6,9,10)]
+Forage_models_table <- dplyr::left_join(Forage_models_table, r2_m)[,c(1,2,4,6,9,10)]
 Forage_models_table
 ```
 
@@ -320,7 +322,7 @@ Calculate the 95% confidence interval of the top model by creating a function wh
 
 ```{r}
 CI_foraging <- function(offs) {
-  model <- glmer(cbind(Foraging, NonForaging) ~ 
+  model <- lme4::glmer(cbind(Foraging, NonForaging) ~ 
               I(PropMoon-offs) + (1| Unique_scan) + (1 | Session) + (1| Date), 
               data = Killdeer, family = binomial)
   ests <- summary(model)$coefficients[1,1:2]
@@ -453,13 +455,14 @@ Name models, create a ranked AIC table, calculate evidence ratios and marginal r
 
 ```{r, warning=FALSE, message=FALSE}
 Modnames <- paste("Model", 1:length(Roosting_models), sep = " ")
-Roost_models_table <- aictab(cand.set = Roosting_models, modnames = Modnames, sort = TRUE)
+Roost_models_table <- AICcmodavg::aictab(cand.set = Roosting_models, 
+                                         modnames = Modnames, sort = TRUE)
 Roost_models_table <- Evidence_Ratios(Roost_models_table)
 r2_m <- data.frame(round(t(as.data.frame(t(sapply(Roosting_models, r2_m_glmm)))), 3))
 r2_m$Modnames <- 
   c("Model 1", "Model 2", "Model 3", "Model 4", "Model 5", "Model 6", "Model 7")
 colnames(r2_m) <- c("r2_m", "Modnames")
-Roost_models_table <- left_join(Roost_models_table, r2_m)[,c(1,2,4,6,9,10)]
+Roost_models_table <- dplyr::left_join(Roost_models_table, r2_m)[,c(1,2,4,6,9,10)]
 Roost_models_table
 ```
 
@@ -467,7 +470,7 @@ Plot the top model with confidence intervals
 
 ```{r, fig.align='center', fig.width=6}
 CI_roosting <- function(offs) {
-  model <- glmer(cbind(Roosting, NonRoosting) ~ 
+  model <- lme4::glmer(cbind(Roosting, NonRoosting) ~ 
               I(PropMoon-offs) + (1| Unique_scan) + (1 | Session) + (1| Date), 
               data = Killdeer, family = binomial)
   ests <- summary(model)$coefficients[1,1:2]
@@ -590,16 +593,13 @@ Name models, create a ranked AIC table, calculate evidence ratios and marginal r
 
 ```{r, warning=FALSE, message=FALSE}
 Modnames <- paste("Model", 1:length(Preening_models), sep = " ")
-Preen_models_table <- aictab(cand.set = Preening_models, modnames = Modnames, sort = TRUE)
+Preen_models_table <- AICcmodavg::aictab(cand.set = Preening_models, 
+                                         modnames = Modnames, sort = TRUE)
 Preen_models_table <- Evidence_Ratios(Preen_models_table)
 r2_m <- data.frame(round(t(as.data.frame(t(sapply(Preening_models, r2_m_glmm)))), 3))
 r2_m$Modnames <- 
   c("Model 1", "Model 2", "Model 3", "Model 4", "Model 5", "Model 6", "Model 7")
 colnames(r2_m) <- c("r2_m", "Modnames")
-Preen_models_table <- left_join(Preen_models_table, r2_m)[,c(1,2,4,6,9,10)]
+Preen_models_table <- dplyr::left_join(Preen_models_table, r2_m)[,c(1,2,4,6,9,10)]
 Preen_models_table
 ```
-
-
-
-###### This is a test ########
