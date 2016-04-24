@@ -19,7 +19,7 @@ The structure of the code I present here follows the analyses presented in the *
 
 **Prerequisites:**
 
-* For running the complete code you need a `files` subfolder containing the raw data downloaded from `Data_files` folder provided in the  [GitHub](https://github.com/leberhartphillips/killdeer_foraging) repository.
+* For running the complete code you need a `files` subfolder containing the raw data downloaded from **`Data_files`** folder provided in the  [GitHub](https://github.com/leberhartphillips/killdeer_foraging) repository.
 * The following packages are needed for analysis and can be easily installed from [CRAN](http://cran.r-project.org/) by uncommenting the `install.packages` functions:
 
 ```{r, results="hide", message=FALSE, cache = TRUE}
