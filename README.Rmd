@@ -3,7 +3,7 @@
 #### Luke J. Eberhart-Phillips
 ##### *Journal of Ornithology* (2017) 158:253-262.
 
-In this repository you can find all the necessary files needed to reproduce the analyses presented in my paper (Read it[here](http://link.springer.com/article/10.1007/s10336-016-1389-4))
+In this repository you can find all the necessary files needed to reproduce the analyses presented in my paper (Read it [here](http://link.springer.com/article/10.1007/s10336-016-1389-4))
 
 * **Rcode_Killdeer_foraging.pdf** contains the documented code for all analyses, which can be implemented after downloading the datasets provided in the **`Data_files`** folder.
 * **`Data_files`**
